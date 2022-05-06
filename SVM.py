@@ -13,7 +13,7 @@ x = spotifyData.drop(['target','song_title', 'artist'], axis=1)
 y = spotifyData['target']
 
 # Split data into training and testing sets
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=69)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.9, random_state=69)
 
 # Fit model
 svc = SVC(kernel='linear')

@@ -17,10 +17,10 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_
 
 # Fit model
 svc = SVC(kernel='linear')
-svc.fit(x_train, y_train)
+model = svc.fit(x_train, y_train)
 
 # Test model
-y_pred = svc.predict(x_test)
+y_pred = model.predict(x_test)
 
 # See results
 print(confusion_matrix(y_test, y_pred))

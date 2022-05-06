@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import AdaBoostClassifier
+#from sklearn.ensemble import
+from xgboost import XGBClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 
 # Import Data
@@ -17,10 +18,10 @@ y = spotifyData['target']
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
 
 #create classifier
-abc = AdaBoostClassifier(n_estimators=50, learning_rate=1)
+xgbc = XGBClassifier(n_estimators=50, learning_rate=1)
 
 #fit model
-model = abc.fit(x_train, y_train)
+model = xgbc.fit(x_train, y_train)
 
 #prediction
 y_pred = model.predict(x_test)

@@ -17,7 +17,7 @@ y = spotifyData['target']
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
 
 #create classifier
-abc = AdaBoostClassifier(n_estimators=50, learning_rate=0.1)
+abc = AdaBoostClassifier(n_estimators=50, learning_rate=0.5)
 
 #fit model
 model = abc.fit(x_train, y_train)

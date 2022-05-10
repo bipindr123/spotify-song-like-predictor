@@ -9,11 +9,11 @@ from sklearn.metrics import classification_report, confusion_matrix
 spotifyData = pd.read_csv('data1.csv')
 
 # Drop label and irrelevant classes
-x = spotifyData.drop(['target','song_title', 'artist'], axis=1)
+x = spotifyData.drop(['target','song_title', 'artist', 'serial_num'], axis=1)
 y = spotifyData['target']
 
 # Split data into training and testing sets
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.9, random_state=69)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=69)
 
 # Fit model
 rfc = RandomForestClassifier(n_estimators = 100)

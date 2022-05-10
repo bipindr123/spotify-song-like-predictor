@@ -16,7 +16,7 @@ y = spotifyData['target']
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=69)
 
 # Fit model
-svc = SVC(kernel='rbf')
+svc = SVC(kernel='linear')
 model = svc.fit(x_train, y_train)
 
 # Test model

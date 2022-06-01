@@ -1,0 +1,151 @@
+# Import Data
+from matplotlib import pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn import preprocessing
+
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, roc_auc_score
+
+from sklearn.model_selection import train_test_split
+import seaborn as sns
+sns.set(style="darkgrid")
+#import data
+
+spotifyData = pd.read_csv('data1.csv')
+
+
+
+
+# Drop label and irrelevant classes
+x = spotifyData.drop(['target', 'key','mode','song_title','serial_num'], axis=1)
+y = spotifyData['target']
+
+x["artist"] = x["artist"].astype('category')
+x["artist"] = x["artist"].cat.codes
+
+#perform min-max preprocessing
+min_max_scaler = preprocessing.MinMaxScaler()
+x_scaled = min_max_scaler.fit_transform(x)
+x[x.columns.values] = pd.DataFrame(x_scaled)
+
+
+#make a test/train split
+
+x_train, x_test, y_train, y_test = train_test_split( x, y, test_size=0.2, random_state=45, shuffle = 'True')
+
+#make a naive bayes class
+
+class NaiveBayes():
+   
+    def mean_var(self, features, target):
+        '''
+        calculate mean, variance for each column and convert to numpy array
+        ''' 
+        self.mean = features.groupby(target).apply(np.mean).to_numpy()
+        self.var = features.groupby(target).apply(np.var).to_numpy()
+              
+        return self.mean, self.var
+
+    def calculate_gaussian(self, class_idx, x):     
+        '''
+        calculate gaussian distribution for the data where target is assumed to be normalized
+        '''
+        mean = self.mean[class_idx]
+        var = self.var[class_idx]
+        num = np.exp((-1/2)*((x-mean)**2) / (2 * var))
+        denum = np.sqrt(2 * np.pi * var)
+        prob = num / denum
+        return prob
+
+    def calculate_prior(self, features, target):
+        ''' Calculate prior probability for each class'''
+       
+        self.prior = (features.groupby(target).apply(lambda x: len(x)) / self.rows).to_numpy()
+
+        return self.prior
+    
+
+    def calculate_posterior(self, x):
+        posteriors = []
+
+        # calculate posterior probability for each class
+        for i in range(self.count):
+            prior = np.log(self.prior[i])
+            conditional = np.sum(np.log(self.calculate_gaussian(i, x)))
+            posterior = prior + conditional
+            posteriors.append(posterior)
+        # return class with highest posterior probability
+        return self.classes[np.argmax(posteriors)]
+     
+     #fit the model
+
+    def fit(self, features, target):
+        self.classes = np.unique(target)
+        self.count = len(self.classes)
+        self.feature_nums = features.shape[1]
+        self.rows = features.shape[0]
+        
+        self.mean_var(features, target)
+        self.calculate_prior(features, target)
+
+    #prediction
+        
+    def predict(self, features):
+        preds = [self.calculate_posterior(f) for f in features.to_numpy()]
+        return preds
+
+    #accuracy
+    def accuracy(self, y_test, y_pred):
+        accuracy = np.sum(y_test == y_pred) / len(y_test)
+        return accuracy
+
+    #visualization
+    def viz(self, y_true, y_pred, target):
+        
+        tr = pd.DataFrame(data=y_true, columns=[target])
+        pr = pd.DataFrame(data=y_pred, columns=[target])
+        
+        
+        fig, ax = plt.subplots(1, 2, sharex='col', sharey='row', figsize=(15,6))
+        
+        sns.countplot(x=target, data=tr, ax=ax[0], palette='hls', alpha=0.7, hue=target, dodge=False)
+        sns.countplot(x=target, data=pr, ax=ax[1], palette='hls', alpha=0.7, hue=target, dodge=False)
+        
+
+        fig.suptitle('True vs Predicted Comparison', fontsize=20)
+
+        ax[0].tick_params(labelsize=12)
+        ax[1].tick_params(labelsize=12)
+        ax[0].set_title("True values", fontsize=18)
+        ax[1].set_title("Predicted values", fontsize=18)
+        plt.show()
+
+
+# train the model
+x = NaiveBayes()
+x.fit(x_train, y_train)
+
+
+#predictions
+
+predictions = x.predict(x_test)
+print(x.accuracy(y_test, predictions))
+
+
+
+#results and visualizations
+print("Confusion Matrix: ")
+print(confusion_matrix(y_test, predictions))
+print("\nClassification Report: ")
+print(classification_report(y_test, predictions))
+print("\nAccuracy Score: ")
+print(accuracy_score(y_test, predictions))
+print("\nROC AUC Score: ")
+print(roc_auc_score(y_test, predictions))
+
+
+
+
+print(x.viz(y_test,predictions,'target'))

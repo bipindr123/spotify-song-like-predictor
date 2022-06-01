@@ -3,13 +3,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, roc_auc_score
 
 # Import Data
 spotifyData = pd.read_csv('data1.csv')
 
+
+
+
 # Drop label and irrelevant classes
-x = spotifyData.drop(['target','song_title', 'artist', 'serial_num'], axis=1)
+x = spotifyData.drop(['target', 'key','mode','song_title','serial_num', 'artist', ], axis=1)
 y = spotifyData['target']
 
 # Split data into training and testing sets
